@@ -1,0 +1,29 @@
+/* CSS Reset */
+html {
+    box-sizing: border-box;
+}
+*,
+*:before,
+*:after {
+    margin: 0;
+    padding: 0;
+    box-sizing: inherit;
+}
+
+body {
+    display: grid;
+    grid-template-rows: 120px auto 120px;
+    min-height: 100vh;
+}
+
+header {
+    background-color: #eaeaea;
+}
+
+main {
+    background-color: #fafafa;
+}
+
+footer {
+    background-color: #eaeaea;
+}

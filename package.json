@@ -1,0 +1,19 @@
+{
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "express": "^5.1.0",
+    "express-session": "^1.18.1",
+    "sqlite3": "^5.1.7"
+  },
+  "name": "eksamen",
+  "version": "2.0.0",
+  "main": "app.js",
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node --watch app.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}
