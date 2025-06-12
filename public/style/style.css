@@ -1,29 +1,319 @@
-/* CSS Reset */
-html {
-    box-sizing: border-box;
-}
-*,
-*:before,
-*:after {
+/* Generelle stiler for hele siden */
+body {
+    font-family: 'Inter', sans-serif; /* Bruker Inter font (må lastes inn i HTML eller fra CDN) */
     margin: 0;
     padding: 0;
-    box-sizing: inherit;
+    background-color: #f4f7f6; /* Lys grå bakgrunn */
+    color: #333;
+    line-height: 1.6;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; /* Sikrer at footeren alltid er nederst */
 }
 
-body {
-    display: grid;
-    grid-template-rows: 120px auto 120px;
-    min-height: 100vh;
-}
-
+/* Header stiler */
 header {
-    background-color: #eaeaea;
+    background-color: #2c3e50; /* Mørk blå/grå */
+    color: #ecf0f1; /* Lys tekstfarge */
+    padding: 1.5rem 1rem;
+    display: flex;
+    flex-direction: column; /* Standard for mobil */
+    align-items: center;
+    gap: 1rem; /* Mellomrom mellom elementer */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+header h1 {
+    margin: 0;
+    font-size: 1.8rem;
+    text-align: center;
+}
+
+header p {
+    margin: 0.5rem 0 0;
+    font-size: 0.9rem;
+}
+
+.logo {
+    /* Plassholder for logo, kan erstattes med et bilde */
+    width: 50px;
+    height: 50px;
+    background-color: #3498db;
+    border-radius: 50%;
+    /* display: none; */ /* Skjul hvis du ikke har logo */
+}
+
+/* Navigasjonsstiler */
+nav {
+    display: flex;
+    gap: 1.2rem;
+    flex-wrap: wrap; /* Tillat linjeskift på små skjermer */
+    justify-content: center;
+}
+
+nav a {
+    color: #ecf0f1;
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    border-radius: 8px; /* Runde hjørner */
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+nav a:hover, nav a:focus {
+    background-color: #3498db; /* Blå ved hover */
+    transform: translateY(-2px); /* Liten løfteeffekt */
+}
+
+/* Hovedinnhold stiler */
 main {
-    background-color: #fafafa;
+    flex-grow: 1; /* Tar opp all tilgjengelig plass */
+    padding: 2rem 1rem;
+    max-width: 1400px; /* Maks bredde for innhold */
+    margin: 20px auto; /* Sentrer innholdet */
+    background-color: #ffffff; /* Hvit bakgrunn for innhold */
+    border-radius: 12px; /* Runde hjørner */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
 }
 
+/* Seksjonsstiler */
+section {
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px; /* Runde hjørner */
+    background-color: #fdfdfd;
+}
+
+section h2 {
+    color: #2c3e50;
+    border-bottom: 2px solid #3498db;
+    padding-bottom: 0.5rem;
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+}
+
+/* Form stiler */
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+form div {
+    display: flex;
+    flex-direction: column;
+}
+
+form label {
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+    color: #555;
+}
+
+form input[type="text"],
+form input[type="email"],
+form input[type="password"] {
+    padding: 0.8rem;
+    border: 1px solid #ccc;
+    border-radius: 8px; /* Runde hjørner */
+    font-size: 1rem;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+form input[type="text"]:focus,
+form input[type="email"]:focus,
+form input[type="password"]:focus {
+    border-color: #3498db;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+    outline: none;
+}
+
+/* Knappestiler */
+button {
+    background-color: #3498db; /* Blå knapp */
+    color: white;
+    padding: 0.9rem 1.5rem;
+    border: none;
+    border-radius: 8px; /* Runde hjørner */
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+button:hover, button:focus {
+    background-color: #2980b9; /* Mørkere blå ved hover */
+    transform: translateY(-2px); /* Liten løfteeffekt */
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+}
+
+
+
+/* Tabellstiler */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1.5rem;
+    background-color: #ffffff;
+    border-radius: 10px; /* Runde hjørner */
+    overflow: hidden; /* Sørger for at runde hjørner gjelder også for innhold */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+table th, table td {
+    padding: 1rem 0.8rem;
+    text-align: left;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+table th {
+    background-color: #34495e; /* Mørkere bakgrunn for overskrifter */
+    color: #ecf0f1;
+    font-weight: bold;
+}
+
+table tbody tr:nth-child(even) {
+    background-color: #f9f9f9; /* Stripete rader */
+}
+
+table tbody tr:hover {
+    background-color: #eef7fc; /* Lys blå ved hover */
+    transition: background-color 0.3s ease;
+}
+
+/* Footer stiler */
 footer {
-    background-color: #eaeaea;
+    background-color: #2c3e50;
+    color: #ecf0f1;
+    text-align: center;
+    padding: 1rem 0;
+    margin-top: auto; /* Skyver footeren til bunnen */
+    font-size: 0.8rem;
+}
+
+/* Responsivt design for mindre skjermer */
+@media (min-width: 768px) {
+    header {
+        flex-direction: row; /* Kolonne layout på større skjermer */
+        justify-content: space-between;
+        padding: 1.5rem 2rem;
+    }
+
+    header h1 {
+        font-size: 2.2rem;
+    }
+
+    header p {
+        margin-right: auto; /* Skyver teksten til venstre */
+        margin-left: 1rem;
+    }
+
+    
+
+    main {
+        padding: 3rem 2rem;
+    }
+
+    form {
+        flex-direction: row;
+        flex-wrap: wrap; /* Tillater at feltene brytes på ny linje */
+        gap: 1.5rem;
+        justify-content: space-between; /* Hjelper med jevn fordeling av plassen */
+    }
+
+    /* Spesifikk stil for input-feltene (ikke knappen) */
+    form > div:not(:last-child) {
+        flex: 0 0 calc(25% - 1.125rem); /* Justert for å tillate fire kolonner med 1.5rem gap */
+    }
+
+    /* Spesifikk stil for div-en som inneholder knappen */
+    form > div:last-child {
+        flex: 0 0 100%; /* Knapp tar hele bredden */
+        display: flex;
+        justify-content: center; /* Sentrer knappen */
+        margin-top: 1rem;
+    }
+}
+
+/* Spesifikke justeringer for privat.html-tabellen for bedre lesbarhet på mobil */
+@media (max-width: 767px) {
+    table, thead, tbody, th, td, tr {
+        display: block;
+    }
+
+    thead tr {
+        position: absolute;
+        top: -9999px;
+        left: -9999px;
+    }
+
+    table tr {
+        border: 1px solid #ccc;
+        margin-bottom: 1rem;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    table td {
+        border: none;
+        border-bottom: 1px solid #eee;
+        position: relative;
+        padding-left: 50%;
+        text-align: right;
+    }
+
+    table td:before {
+        position: absolute;
+        top: 0;
+        left: 6px;
+        width: 45%;
+        padding-right: 10px;
+        white-space: nowrap;
+        text-align: left;
+        font-weight: bold;
+        color: #555;
+    }
+
+    /* Data labels for mobiltabellen */
+    table td:nth-of-type(1):before { content: "Serienummer:"; }
+    table td:nth-of-type(2):before { content: "Merke:"; }
+    table td:nth-of-type(3):before { content: "Modell:"; }
+    table td:nth-of-type(4):before { content: "Sted:"; }
+    table td:nth-of-type(5):before { content: "Registrert av:"; }
+    table td:nth-of-type(6):before { content: "Reg. dato:"; }
+}
+
+
+
+.action-button.edit-button {
+    margin-left: 10px;
+    gap: 10px;
+    background-color: #f1c40f;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 0.6rem 1.2rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+
+
+
+.action-button.delete-button {
+    margin-left: 10px;
+    gap: 10px;
+    background-color: #e74c3c;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 0.6rem 1.2rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.action-button.delete-button:hover,
+.action-button.delete-button:focus {
+    background-color: #c0392b;
+    transform: translateY(-2px);
 }

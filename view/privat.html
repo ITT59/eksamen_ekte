@@ -1,20 +1,290 @@
 <!DOCTYPE html>
-<html lang="nb">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Privat side</title>
-        <link rel="stylesheet" href="/style/style.css" />
-    </head>
-    <body>
-        <header>
-            <div class="logo"></div>
-            <nav>
-                <a href="/login">Logge inn</a>
-                <a href="/ny-bruker">Ny bruker</a>
-            </nav>
-        </header>
-        <main>Privat side</main>
-        <footer>&copy; 2025 Nexatech</footer>
-    </body>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ecodata - Registrer Datamaskin</title>
+    <link rel="stylesheet" href="/style/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <h1>Velkommen til Ecodata Datamaskinregister</h1>
+        <p>Du er logget inn som: <span id="loggedInUser"></span></p>
+        
+        <nav>
+            <a href="/logout" id="logoutButton">Logg ut</a>
+            <a href="/ny-bruker">Ny bruker</a>
+        </nav>
+    </header>
+
+    <main>
+        <section id="registerComputer">
+            <h2>Registrer Ny Datamaskin</h2>
+            <form id="computerForm">
+                <label for="serial_number">Serienummer:</label>
+                <input type="text" id="serial_number" name="serial_number" required>
+
+                <label for="brand">Merke:</label>
+                <input type="text" id="brand" name="brand" required>
+
+                <label for="model">Modell:</label>
+                <input type="text" id="model" name="model">
+
+                <label for="location">Sted:</label>
+                <input type="text" id="location" name="location">
+
+                <div>
+                    <div style="text-align: center;">
+                        <button type="submit" id="submitButton">Registrer Datamaskin</button>
+                    </div>
+                    <button type="button" id="cancelEditButton" style="display:none;">Avbryt Redigering</button>
+                </div>
+            </form>
+            <p id="message" style="color: green; margin-top: 10px;"></p>
+            <p id="error" style="color: red; margin-top: 10px;"></p>
+        </section>
+
+        <section id="computerList">
+            <h2>Registrerte Datamaskiner</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Serienummer</th>
+                        <th>Merke</th>
+                        <th>Modell</th>
+                        <th>Sted</th>
+                        <th>Registrert av</th>
+                        <th>Registreringsdato</th>
+                        <th>Handlinger</th> <!-- Ny kolonne for handlinger -->
+                    </tr>
+                </thead>
+                <tbody id="computersTableBody">
+                    <!-- Datamaskiner vil bli satt inn her av JavaScript -->
+                    <tr><td colspan="7">Laster datamaskiner...</td></tr>
+                </tbody>
+            </table>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Ecodata</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const loggedInUserSpan = document.getElementById('loggedInUser');
+            const logoutButton = document.getElementById('logoutButton');
+            const computerForm = document.getElementById('computerForm');
+            const submitButton = document.getElementById('submitButton');
+            const cancelEditButton = document.getElementById('cancelEditButton');
+            const messageParagraph = document.getElementById('message');
+            const errorParagraph = document.getElementById('error');
+            const computersTableBody = document.getElementById('computersTableBody');
+
+            let editMode = false;
+            let currentComputerId = null;
+
+            // Hent og vis brukernavn fra sesjonen via API
+            async function fetchUserInfo() {
+                try {
+                    const response = await fetch('/api/user-info');
+                    if (!response.ok) {
+                        console.error('Kunne ikke hente brukerinfo. Status:', response.status);
+                        window.location.href = '/login'; // Omdiriger til login hvis sesjonen er ugyldig
+                        return null;
+                    }
+                    const data = await response.json();
+                    loggedInUserSpan.textContent = data.username || 'Ukjent bruker';
+                    return data;
+                } catch (error) {
+                    console.error('Nettverksfeil ved henting av brukerinfo:', error);
+                    loggedInUserSpan.textContent = 'Feil ved lasting';
+                    window.location.href = '/login';
+                    return null;
+                }
+            }
+
+            // Funksjon for å fylle ut skjemaet med data for redigering
+            function populateFormForEdit(computer) {
+                document.getElementById('serial_number').value = computer.serial_number;
+                document.getElementById('brand').value = computer.brand;
+                document.getElementById('model').value = computer.model;
+                document.getElementById('location').value = computer.location;
+
+                submitButton.textContent = 'Oppdater Datamaskin';
+                cancelEditButton.style.display = 'inline-block'; // Vis avbryt-knappen
+                editMode = true;
+                currentComputerId = computer.computer_id;
+                document.getElementById('serial_number').focus(); // Fokus på første felt
+            }
+
+            // Funksjon for å nullstille skjema og knapper
+            function resetFormAndButtons() {
+                computerForm.reset();
+                submitButton.textContent = 'Registrer Datamaskin';
+                cancelEditButton.style.display = 'none'; // Skjul avbryt-knappen
+                editMode = false;
+                currentComputerId = null;
+                messageParagraph.textContent = '';
+                errorParagraph.textContent = '';
+            }
+
+            // Håndter skjema for registrering/oppdatering av datamaskin
+            computerForm.addEventListener('submit', async (event) => {
+                event.preventDefault();
+
+                messageParagraph.textContent = '';
+                errorParagraph.textContent = '';
+
+                const formData = {
+                    serial_number: document.getElementById('serial_number').value,
+                    brand: document.getElementById('brand').value,
+                    model: document.getElementById('model').value,
+                    location: document.getElementById('location').value
+                };
+
+                const method = editMode ? 'PUT' : 'POST';
+                const url = editMode ? `/api/computers/${currentComputerId}` : '/api/computers';
+
+                try {
+                    const response = await fetch(url, {
+                        method: method,
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(formData)
+                    });
+
+                    const result = await response.json();
+
+                    if (response.ok) {
+                        messageParagraph.textContent = result.message;
+                        resetFormAndButtons(); // Nullstill skjema og knapper
+                        fetchComputers(); // Oppdater listen
+                    } else {
+                        errorParagraph.textContent = result.message || 'Feil ved handling.';
+                    }
+                } catch (error) {
+                    console.error('Nettverksfeil:', error);
+                    errorParagraph.textContent = 'Nettverksfeil. Vennligst prøv igjen.';
+                }
+            });
+
+            // Håndter avbryt redigering
+            cancelEditButton.addEventListener('click', resetFormAndButtons);
+
+            // Funksjon for å hente og vise datamaskiner
+            async function fetchComputers() {
+                try {
+                    const response = await fetch('/api/computers');
+                    if (!response.ok) {
+                        console.error('Kunne ikke hente datamaskiner. Status:', response.status);
+                        computersTableBody.innerHTML = '<tr><td colspan="7" style="color: red;">Feil ved lasting av datamaskiner. Sesjonen kan ha utløpt.</td></tr>';
+                        if (response.status === 401) {
+                            window.location.href = '/login';
+                        }
+                        return;
+                    }
+                    const computers = await response.json();
+
+                    computersTableBody.innerHTML = '';
+                    if (computers.length === 0) {
+                        computersTableBody.innerHTML = '<tr><td colspan="7">Ingen datamaskiner registrert.</td></tr>';
+                        return;
+                    }
+
+                    computers.forEach(comp => {
+                        const row = computersTableBody.insertRow();
+                        row.insertCell().textContent = comp.serial_number;
+                        row.insertCell().textContent = comp.brand;
+                        row.insertCell().textContent = comp.model;
+                        row.insertCell().textContent = comp.location;
+                        row.insertCell().textContent = comp.registered_by_username || 'Ukjent';
+                        row.insertCell().textContent = new Date(comp.registration_date).toLocaleDateString('no-NO');
+
+                        // Legg til handlinger (Rediger/Slett)
+                        const actionsCell = row.insertCell();
+                        const editButton = document.createElement('button');
+                        editButton.textContent = 'Rediger';
+                        editButton.classList.add('action-button', 'edit-button');
+                        editButton.dataset.id = comp.computer_id;
+                        editButton.dataset.serial_number = comp.serial_number; // Lagre data for enkel tilgang
+                        editButton.dataset.brand = comp.brand;
+                        editButton.dataset.model = comp.model;
+                        editButton.dataset.location = comp.location;
+                        actionsCell.appendChild(editButton);
+
+                        const deleteButton = document.createElement('button');
+                        deleteButton.textContent = 'Slett';
+                        deleteButton.classList.add('action-button', 'delete-button');
+                        deleteButton.dataset.id = comp.computer_id;
+                        actionsCell.appendChild(deleteButton);
+                    });
+                } catch (error) {
+                    console.error('Nettverksfeil ved henting av datamaskiner:', error);
+                    computersTableBody.innerHTML = '<tr><td colspan="7" style="color: red;">Nettverksfeil. Kunne ikke laste datamaskiner.</td></tr>';
+                }
+            }
+
+            // Håndter klikk på rediger/slett knapper (event delegation)
+            computersTableBody.addEventListener('click', async (event) => {
+                if (event.target.classList.contains('edit-button')) {
+                    const button = event.target;
+                    const computer = {
+                        computer_id: parseInt(button.dataset.id),
+                        serial_number: button.dataset.serial_number,
+                        brand: button.dataset.brand,
+                        model: button.dataset.model,
+                        location: button.dataset.location
+                    };
+                    populateFormForEdit(computer);
+                } else if (event.target.classList.contains('delete-button')) {
+                    const computerId = event.target.dataset.id;
+                    if (confirm('Er du sikker på at du vil slette denne datamaskinen?')) { // Bruk en custom modal i prod!
+                        try {
+                            const response = await fetch(`/api/computers/${computerId}`, {
+                                method: 'DELETE'
+                            });
+                            const result = await response.json();
+                            if (response.ok) {
+                                messageParagraph.textContent = result.message;
+                                fetchComputers(); // Oppdater listen
+                            } else {
+                                errorParagraph.textContent = result.message || 'Feil ved sletting.';
+                            }
+                        } catch (error) {
+                            console.error('Nettverksfeil ved sletting:', error);
+                            errorParagraph.textContent = 'Nettverksfeil. Vennligst prøv igjen.';
+                        }
+                    }
+                }
+            });
+
+            // Håndter utlogging
+            logoutButton.addEventListener('click', async () => {
+                try {
+                    const response = await fetch('/api/logout', { method: 'POST' });
+                    if (response.ok) {
+                        window.location.href = '/login';
+                    } else {
+                        const errorData = await response.json();
+                        alert('Klarte ikke å logge ut: ' + (errorData.message || 'Ukjent feil'));
+                    }
+                } catch (error) {
+                    console.error('Feil ved utlogging:', error);
+                    alert('Nettverksfeil. Vennligst prøv igjen.');
+                }
+            });
+
+            // Initial lasting når siden er klar
+            const user = await fetchUserInfo();
+            if (user) {
+                fetchComputers();
+            }
+        });
+    </script>
+</body>
 </html>
